@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiResponse } from '../common/response.interface';
 import { ResponseUtil } from '../common/response.util';
 
-@Controller('filmes')
+@Controller('movies')
 @UseGuards(JwtAuthGuard)
 export class FilmesController {
   constructor(
@@ -29,9 +29,9 @@ export class FilmesController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('imagem', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async create(
-    @Body('nome') nome: string,
+    @Body('name') name: string,
     @Body('status') status: string,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ApiResponse<Filme>> {
@@ -40,15 +40,15 @@ export class FilmesController {
       imagemUrl = await this.supabaseService.uploadFile(file);
     }
     const statusBoolean = status === 'true' || status === '1' ? true : false;
-    const filme = await this.filmesService.create(nome, imagemUrl, statusBoolean);
+    const filme = await this.filmesService.create(name, imagemUrl, statusBoolean);
     return ResponseUtil.success(201, filme);
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('imagem', { storage: memoryStorage() }))
+  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async update(
     @Param('id') id: string,
-    @Body('nome') nome: string,
+    @Body('name') nome: string,
     @Body('status') status: string,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ApiResponse<Filme>> {
@@ -61,7 +61,7 @@ export class FilmesController {
     return ResponseUtil.success(200, filme);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   async remove(@Param('id') id: string): Promise<ApiResponse<null>> {
     await this.filmesService.remove(+id);
     return ResponseUtil.success(200, null);

@@ -22,15 +22,15 @@ export class FilmesService {
     return filme;
   }
 
-  async create(nome: string, imagem: string | null, status: boolean): Promise<Filme> {
-    const filme = this.filmesRepository.create({ nome, imagem, status });
+  async create(name: string, image: string | null, status: boolean): Promise<Filme> {
+    const filme = this.filmesRepository.create({ name, image, status });
     return this.filmesRepository.save(filme);
   }
 
-  async update(id: number, nome: string, imagem: string | null, status: boolean): Promise<Filme> {
+  async update(id: number, name: string, image: string | null, status: boolean): Promise<Filme> {
     const filme = await this.findOne(id); // Reusa findOne para verificar existência
-    filme.nome = nome || filme.nome; // Atualiza apenas se fornecido
-    filme.imagem = imagem !== null ? imagem : filme.imagem; // Mantém a imagem atual se null
+    filme.name = name || filme.name; // Atualiza apenas se fornecido
+    filme.image = image !== null ? image : filme.image; // Mantém a image atual se null
     filme.status = status !== undefined ? status : filme.status; // Mantém o status atual se não fornecido
     return this.filmesRepository.save(filme);
   }
