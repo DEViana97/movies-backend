@@ -11,6 +11,9 @@ export class Filme {
   @Column({ type: 'text', nullable: true })
   image: string | null;
 
-  @Column()
+  @Column({ default: false })
   status: boolean;
+
+  @Column({ nullable: true, type: 'float' })
+  starRating?: number;
 }
