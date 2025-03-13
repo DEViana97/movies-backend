@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { Filme } from './filme.entity';
 import { CreateFilmeDto } from './dto/create-filme.dto';
 import { UpdateFilmeDto } from './dto/update-filme.dto';
+import { SupabaseService } from './supabase.service';
 
 @Injectable()
 export class FilmesService {
   constructor(
     @InjectRepository(Filme)
     private filmesRepository: Repository<Filme>,
+    private supabaseService: SupabaseService,
   ) {}
 
   findAll(status?: boolean): Promise<Filme[]> {
@@ -25,8 +27,12 @@ export class FilmesService {
     return filme;
   }
 
-  async create(createFilmeDto: CreateFilmeDto): Promise<Filme> {
-    const filme = this.filmesRepository.create(createFilmeDto);
+  async create(createFilmeDto: CreateFilmeDto, file: Express.Multer.File): Promise<Filme> {
+    const imagemUrl = await this.supabaseService.uploadFile(file);
+    const filme = this.filmesRepository.create({
+      ...createFilmeDto,
+      image: imagemUrl,
+    });
     // Status será false por padrão devido à entidade
     return this.filmesRepository.save(filme);
   }

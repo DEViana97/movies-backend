@@ -34,8 +34,11 @@ export class FilmesController {
 
   @Post()
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
-  async create(@Body() createFilmeDto: CreateFilmeDto) {
-    const filme = await this.filmesService.create(createFilmeDto);
+  async create(
+    @Body() createFilmeDto: CreateFilmeDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const filme = await this.filmesService.create(createFilmeDto, file);
     return {
       status: 201,
       message: 'Filme criado com sucesso',
