@@ -11,11 +11,3 @@ export interface LoginResponseData {
     username: string;
   };
 }
-
-export interface ResponseUtil {
-  access_token: string;
-  user: {
-    id: number;
-    username: string;
-  };
-}

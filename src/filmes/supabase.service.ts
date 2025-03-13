@@ -1,17 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class SupabaseService {
-  private supabase = createClient(
-    'https://cscpdbbmntvyqibvnufl.supabase.co', // Sua URL do Supabase
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzY3BkYmJtbnR2eXFpYnZudWZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA1MDE2NDIsImV4cCI6MjA1NjA3NzY0Mn0.bNmIFC8UOyOYhBEeBwAPhArJVEfbRnvDceJyemyu9hI', // Sua chave anon
-  );
+  constructor(
+    private readonly configService: ConfigService,
+  ) {
+    this.supabase = createClient(
+      this.configService.get<string>('SUPABASE_URL') || '', // Sua URL do Supabase
+      this.configService.get<string>('SUPABASE_ANON_KEY') || '', // Sua chave anon
+    );
+  }
+  private supabase;
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
     const fileName = `${Date.now()}-${file.originalname}`;
-    console.log('Tamanho do buffer:', file.buffer.length); // Verifique o tamanho
-    console.log('MIME Type:', file.mimetype); // Verifique o tipo
 
     const { data, error } = await this.supabase.storage
       .from('movie-images')

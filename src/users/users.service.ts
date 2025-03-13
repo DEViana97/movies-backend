@@ -11,11 +11,8 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async findOne(username: string): Promise<User | null> { // Mude de undefined para null
-    console.log('findOne chamado com username:', username);
-    const user = await this.usersRepository.findOneBy({ username });
-    console.log('findOne resultado:', user);
-    return user;
+  async findOne(username: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ username });
   }
 
   async create(username: string, password: string): Promise<User> {
@@ -24,8 +21,7 @@ export class UsersService {
       throw new ConflictException('Username already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('Senha hasheada:', hashedPassword);
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash com salt
     const user = this.usersRepository.create({
       username,
       password: hashedPassword,

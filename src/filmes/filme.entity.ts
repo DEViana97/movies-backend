@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('movie')
 export class Filme {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  nome: string;
+  name: string;
 
   @Column({ type: 'text', nullable: true })
-  imagem: string | null;
+  image: string | null;
 
   @Column()
   status: boolean;

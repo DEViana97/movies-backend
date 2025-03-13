@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
+import { ApiResponse } from '../common/response.interface';
 
 @Controller('users')
 export class UsersController {
@@ -10,7 +11,12 @@ export class UsersController {
   async register(
     @Body('username') username: string,
     @Body('password') password: string,
-  ): Promise<User> {
-    return this.usersService.create(username, password);
+  ): Promise<ApiResponse<User>> {
+    const user = await this.usersService.create(username, password);
+    return {
+      status: 201,
+      message: 'Request successful',
+      data: user,
+    };
   }
 }
