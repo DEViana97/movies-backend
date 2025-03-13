@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseInterceptors, UploadedFile, UseGuards, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { FilmesService } from './filmes.service';
@@ -7,6 +7,9 @@ import { Filme } from './filme.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiResponse } from '../common/response.interface';
 import { ResponseUtil } from '../common/response.util';
+import { CreateFilmeDto } from './dto/create-filme.dto';
+import { UpdateFilmeDto } from './dto/update-filme.dto';
+import { FindFilmesDto } from './dto/find-filmes.dto';
 
 @Controller('movies')
 @UseGuards(JwtAuthGuard)
@@ -17,8 +20,9 @@ export class FilmesController {
   ) {}
 
   @Get()
-  async findAll(): Promise<ApiResponse<Filme[]>> {
-    const filmes = await this.filmesService.findAll();
+  async findAll(@Query() query: FindFilmesDto): Promise<ApiResponse<Filme[]>> {
+    const statusFilter = query.status === 'true' ? true : query.status === 'false' ? false : undefined;
+    const filmes = await this.filmesService.findAll(statusFilter);
     return ResponseUtil.success(200, filmes);
   }
 
@@ -31,34 +35,26 @@ export class FilmesController {
   @Post()
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async create(
-    @Body('name') name: string,
-    @Body('status') status: string,
+    @Body() createFilmeDto: CreateFilmeDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ApiResponse<Filme>> {
-    let imagemUrl: string | null = null;
-    if (file) {
-      imagemUrl = await this.supabaseService.uploadFile(file);
-    }
-    const statusBoolean = status === 'true' || status === '1' ? true : false;
-    const filme = await this.filmesService.create(name, imagemUrl, statusBoolean);
-    return ResponseUtil.success(201, filme);
+  ) {
+    const filme = await this.filmesService.create(createFilmeDto, file);
+    return {
+      status: 201,
+      message: 'Filme criado com sucesso',
+      data: filme,
+    };
   }
 
   @Put(':id')
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
-  async update(
-    @Param('id') id: string,
-    @Body('name') nome: string,
-    @Body('status') status: string,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<ApiResponse<Filme>> {
-    let imagemUrl: string | null = null;
-    if (file) {
-      imagemUrl = await this.supabaseService.uploadFile(file);
-    }
-    const statusBoolean = status === 'true' || status === '1' ? true : false;
-    const filme = await this.filmesService.update(+id, nome, imagemUrl, statusBoolean);
-    return ResponseUtil.success(200, filme);
+  async update(@Param('id') id: string, @Body() updateFilmeDto: UpdateFilmeDto) {
+    const filme = await this.filmesService.update(+id, updateFilmeDto);
+    return {
+      status: 200,
+      message: 'Filme atualizado com sucesso',
+      data: filme,
+    };
   }
 
   @Delete('delete/:id')
