@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseInterceptors, UploadedFile, UseGuards, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { FilmesService } from './filmes.service';
@@ -17,8 +17,9 @@ export class FilmesController {
   ) {}
 
   @Get()
-  async findAll(): Promise<ApiResponse<Filme[]>> {
-    const filmes = await this.filmesService.findAll();
+  async findAll(@Query('status') status?: string): Promise<ApiResponse<Filme[]>> {
+    const statusFilter = status === 'true' ? true : status === 'false' ? false : undefined;
+    const filmes = await this.filmesService.findAll(statusFilter);
     return ResponseUtil.success(200, filmes);
   }
 

@@ -10,8 +10,9 @@ export class FilmesService {
     private filmesRepository: Repository<Filme>,
   ) {}
 
-  findAll(): Promise<Filme[]> {
-    return this.filmesRepository.find();
+  findAll(status?: boolean): Promise<Filme[]> {
+    const whereClause = status !== undefined ? { status } : {};
+    return this.filmesRepository.find({ where: whereClause });
   }
 
   async findOne(id: number): Promise<Filme> {
