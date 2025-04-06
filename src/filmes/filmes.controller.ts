@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Put, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, UseGuards, Query, UseInterceptors } from '@nestjs/common';
 import { FilmesService } from './filmes.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateFilmeDto } from './dto/create-filme.dto';
 import { UpdateFilmeDto } from './dto/update-filme.dto';
 import { FindFilmesDto } from './dto/find-filmes.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Controller('movies')
 @UseGuards(JwtAuthGuard)
@@ -22,6 +24,7 @@ export class FilmesController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async create(@Body() createFilmeDto: CreateFilmeDto) {
     const filme = await this.filmesService.create(createFilmeDto);
     return {

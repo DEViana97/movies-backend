@@ -17,6 +17,14 @@ export class FilmesService {
     return this.filmesRepository.find({ where: whereClause });
   }
 
+  async findOne(id: number): Promise<Filme> {
+    const filme = await this.filmesRepository.findOneBy({ id });
+    if (!filme) {
+      throw new NotFoundException(`Filme com ID ${id} não encontrado`);
+    }
+    return filme;
+  }
+
   async create(createFilmeDto: CreateFilmeDto): Promise<Filme> {
     const filme = this.filmesRepository.create(createFilmeDto);
     // Status será false por padrão devido à entidade
