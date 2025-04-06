@@ -3,11 +3,11 @@ import { IsString, IsBoolean, IsNumber, IsOptional } from 'class-validator';
 export class UpdateFilmeDto {
   @IsString()
   @IsOptional()
-  nome?: string;
+  name?: string;
 
   @IsString()
   @IsOptional()
-  imagem?: string;
+  image?: string;
 
   @IsBoolean()
   @IsOptional()
